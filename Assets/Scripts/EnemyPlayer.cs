@@ -9,10 +9,15 @@ public class EnemyPlayer : MonoBehaviour
     public TextMeshProUGUI healthText;
     public Image healthBar;
     public GameObject gameOverPanel;
+    public TextMeshProUGUI gameOverText;
+
+    public HeroPlayer hero;
+    public float attackDelay = 0.8f;
 
     public void GameOver()
     {
         animController.SetBool("Death", true);
+        gameOverText.text = "Game Over\nYou Win";
         gameOverPanel.SetActive(true);
     }
     public void GetHurt(int damage)
@@ -33,9 +38,28 @@ public class EnemyPlayer : MonoBehaviour
         {
             GameOver();
         }
-        else
+        else if (!IsInvoking("GetAttack"))
         {
-            Debug.Log("Enemy Health: " + enemyHealth);
+            // vurulduktan biraz sonra karsilik ver
+            Invoke("GetAttack", attackDelay);
         }
+    }
+    public void GetAttack()
+    {
+        if (enemyHealth <= 0 || hero.heroHealth <= 0)
+        {
+            return;
+        }
+        animController.SetTrigger("Attack");
+        // kilic inince P1 hasar alsin
+        Invoke("HitHero", 0.4f);
+    }
+    public void HitHero()
+    {
+        if (enemyHealth <= 0)
+        {
+            return;
+        }
+        hero.GetHurt();
     }
 }

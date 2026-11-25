@@ -9,6 +9,10 @@ public class HeroPlayer : MonoBehaviour
     public int heroHealth = 100;
     public TextMeshProUGUI healthText;
     public Image healthBar;
+    public GameObject hitEffect;
+    public SpriteRenderer heroSprite;
+    public GameObject gameOverPanel;
+    public TextMeshProUGUI gameOverText;
 
     public EnemyPlayer enemy;
     public int attack1Damage = 10;
@@ -62,20 +66,34 @@ public class HeroPlayer : MonoBehaviour
     public void GameOver()
     {
         animController.SetBool("Death", true);
+        heroSprite.color = Color.gray;
+        gameOverText.text = "Game Over\nYou Lose";
+        gameOverPanel.SetActive(true);
     }
     public void GetHurt()
     {
-        if (heroHealth <= 0)
+        if (heroHealth <= 0 || enemy.enemyHealth <= 0)
         {
             return;
         }
         animController.SetTrigger("Hurt");
         heroHealth = heroHealth - 20;
+        hitEffect.SetActive(false);
+        hitEffect.SetActive(true);
+        heroSprite.color = Color.red;
+        Invoke("ResetColor", 0.2f);
         healthText.text = "Health: " + heroHealth.ToString();
         healthBar.fillAmount = (float)heroHealth / 100;
         if (heroHealth <= 0)
         {
             GameOver();
+        }
+    }
+    public void ResetColor()
+    {
+        if (heroHealth > 0)
+        {
+            heroSprite.color = Color.white;
         }
     }
     public void GetAttack()
